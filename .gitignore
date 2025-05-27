@@ -1,0 +1,37 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+.venv/
+venv/
+ENV/
+env/
+virtualenv/
+Virtualenv/
+myenv/
+
+# IDEs and editors
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sublime-workspace
+
+# Operating System files
+.DS_Store
+Thumbs.db
+
+# Configuration files (sensitive - provide an example file instead)
+config.py
+
+# Data files & Outputs (if you don't want to commit them)
+# *.jsonl
+# TrainingImages/ 
+# Add other specific files or patterns if needed
+*.log
+*.tmp
+*.temp

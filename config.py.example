@@ -1,0 +1,48 @@
+# config.py.example
+
+# --- GCP Project and Vertex AI Settings ---
+PROJECT_ID = "your-gcp-project-id"  # Replace with your GCP Project ID
+LOCATION = "us-central1"  # Replace with your GCP region for Vertex AI (e.g., us-central1)
+# User provides the Gemini model ID for Vertex AI, this is a default suggestion
+GEMINI_MODEL_FOR_DESCRIPTIONS = "gemini-2.0-flash-001" 
+# You might also want a separate config for the streaming model if it differs:
+# GEMINI_MODEL_FOR_STREAMING_DESCRIPTIONS = "gemini-2.0-flash-001" 
+
+# --- GCS Settings ---
+GCS_BUCKET_NAME = "your-gcs-bucket-name" # Replace with your GCS bucket name
+# GCS_UPLOAD_PREFIX will be the "folder" within the bucket where images from local are uploaded
+GCS_IMAGE_UPLOAD_PREFIX = "imagen_lora_finetuning/uploaded_images" # Example prefix
+# GCS_JSONL_PREFIX will be the "folder" for the training JSONL file
+GCS_JSONL_PREFIX = "imagen_lora_finetuning/training_data" # Example prefix
+
+# --- Local Data Settings ---
+# Update this path if your local training images are stored elsewhere
+LOCAL_IMAGE_DIR = "/path/to/your/local/TrainingImages/" # Replace with the actual path to your images
+
+# --- Image Processing Settings ---
+VALID_IMAGE_EXTENSIONS = ('.png', '.jpg', '.jpeg', '.webp', '.heic', '.heif')
+TARGET_IMAGE_SIZE_FOR_GEMINI = (1024, 1024) # For preparing images for Gemini description
+MAX_IMAGE_FILE_SIZE_BYTES_FOR_GEMINI = 20 * 1024 * 1024 # 20MB, for pre-check before sending to Gemini
+
+# --- Imagen Fine-Tuning Job Settings ---
+IMAGEN_BASE_MODEL = "imagen-3.0-capability-001" # Base model for fine-tuning
+# ADAPTER_SIZE: "ADAPTER_SIZE_ONE", "ADAPTER_SIZE_FOUR", "ADAPTER_SIZE_EIGHT", "ADAPTER_SIZE_SIXTEEN", "ADAPTER_SIZE_THIRTY_TWO"
+DEFAULT_ADAPTER_SIZE = "ADAPTER_SIZE_SIXTEEN"
+DEFAULT_EPOCHS = 50
+DEFAULT_LEARNING_RATE_MULTIPLIER = 1.0
+DEFAULT_TUNED_MODEL_DISPLAY_NAME = "my-tuned-imagen-lora-model" # User can override this in the app
+
+# --- Output files ---
+LOCAL_TRAIN_JSONL_FILENAME = "train_custom_data.jsonl" # Default local name for the generated JSONL
+
+# --- Derived GCS Paths (constructed for convenience) ---
+# These functions help build full GCS paths based on the settings above.
+# No need to change these unless you change the GCS structure.
+def get_gcs_image_upload_path():
+    return f"gs://{GCS_BUCKET_NAME}/{GCS_IMAGE_UPLOAD_PREFIX}"
+
+def get_gcs_jsonl_path():
+    return f"gs://{GCS_BUCKET_NAME}/{GCS_JSONL_PREFIX}"
+
+def get_gcs_jsonl_file_uri(filename=LOCAL_TRAIN_JSONL_FILENAME):
+    return f"gs://{GCS_BUCKET_NAME}/{GCS_JSONL_PREFIX}/{filename}"
