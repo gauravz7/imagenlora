@@ -233,15 +233,10 @@ def generate_description_vertex_stream_from_gcs_uri(
 
     # Specific instruction for Gemini, incorporating the subject_name
     llm_instruction = (
-        f"Describe the person '{subject_name}' in the provided image. "
-        f"Focus on their clothing, action, pose, hairstyle, and other notable visual details. "
-        f"Start your description with a verb (e.g., 'is wearing...', 'stands...'), "
-        f"a prepositional phrase (e.g., 'in a red dress...', 'with flowing hair...'), "
-        f"or an adjective phrase that would naturally complete a sentence about them. "
-        f"Do not repeat the subject's name ('{subject_name}') in your response. "
-        f"Your response should be a concise phrase. "
-        f"Example: if '{subject_name}' is in a green shirt, you might respond 'wearing a green shirt and jeans.' "
-        f"or 'with a thoughtful expression, looking to the side.'"
+        f"Describe the person '{subject_name}' in the provided image. Focus on their clothing, action, pose, hairstyle, and other notable visual details. \
+            Start your description with a verb (e.g., 'is wearing...', 'stands...'), a prepositional phrase (e.g., 'in a red dress...', 'with flowing hair...'), \
+            or an adjective phrase that would naturally complete a sentence about them. Do not repeat the subject's name ('{subject_name}') in your response. \
+            Your response should be a concise phrase. Example: if '{subject_name}' is in a green shirt, you might respond 'wearing a green shirt and jeans.' or 'with a thoughtful expression, looking to the side.'"
     )
     text_part = types.Part.from_text(text=llm_instruction)
     
