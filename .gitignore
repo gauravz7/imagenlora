@@ -30,7 +30,7 @@ config.py
 
 # Data files & Outputs (if you don't want to commit them)
 # *.jsonl
-# TrainingImages/ 
+TrainingImages/ 
 # Add other specific files or patterns if needed
 *.log
 *.tmp
