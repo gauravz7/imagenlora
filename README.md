@@ -1,122 +1,137 @@
-# Imagen LoRA Fine-Tuning and Inference Toolkit on Vertex AI
+# Imagen LoRA: Easy Fine-Tuning and Image Generation on Vertex AI
 
-This project provides a Streamlit-based web application to orchestrate the fine-tuning of Google's Imagen models using Low-Rank Adaptation (LoRA) on Vertex AI, and to perform inference using the fine-tuned models. It also includes a separate tab for general image generation using specified Imagen models on Vertex AI.
+Welcome! This project helps you fine-tune Google's Imagen models (powerful AI for creating images from text) using a technique called LoRA (Low-Rank Adaptation). Once fine-tuned, you can use your custom model to generate new images. It all happens on Google Cloud's Vertex AI platform, and this toolkit provides a user-friendly Streamlit web app to manage the process.
 
-## Overview
+You can also use this app for general image generation with standard Imagen models.
 
-The application is structured into two main tools accessible via a sidebar:
+## What Can You Do With This?
 
-1.  **Fine-Tuning Pipeline:** Guides users through:
-    *   **Data Preparation:** Uploading custom images, image compression, selection of context/target images, AI-assisted generation of descriptive suffixes for prompts using the Gemini API, and creation of the JSONL training data file with flexible prompt formatting.
-    *   **Model Fine-Tuning:** Submitting an Imagen LoRA fine-tuning job to Vertex AI.
-    *   **Job Monitoring:** Tracking the status of submitted fine-tuning jobs.
+This application offers two main tools:
 
-2.  **Imagen Inference:** Allows users to:
-    *   Use a deployed fine-tuned Imagen model endpoint on Vertex AI.
-    *   Provide a context image and one or more textual prompts.
-    *   Generate new images based on the inputs.
-    *   Save generated images and a manifest to a timestamped folder in Google Cloud Storage.
+1.  **Fine-Tuning Your Own Image Model:**
+    *   **Prepare Your Images:** Upload your own pictures. The app helps you compress them, choose which ones to use for training, and even uses AI (Gemini) to help write good descriptions for them. These descriptions become "prompts" that teach your model.
+    *   **Train Your Model:** Send your prepared images and prompts to Vertex AI to start the LoRA fine-tuning process for an Imagen model.
+    *   **Check on Training:** Keep an eye on how your model training is going.
 
-## Key Features
+2.  **Create Images (Imagen Inference):**
+    *   Use a fine-tuned Imagen model that you've trained.
+    *   Give it a starting image (optional) and some text prompts (what you want to see).
+    *   Generate new images based on your instructions!
+    *   Save your creations and a list of what you generated to Google Cloud Storage.
 
-*   **User-Friendly Interface:** Streamlit app for an interactive experience.
-*   **Custom Image Fine-Tuning:**
-    *   Upload local images for fine-tuning.
-    *   Automatic image compression (target <5MB) before GCS upload, overwriting local files if successful.
-    *   Configurable GCS bucket for fine-tuning assets.
-    *   Flexible data selection for context and target images.
-    *   AI-powered description suffix generation using Gemini for rich prompts.
-    *   Customizable prompt structure: `"{SubjectName} [{ContextID}]{OptionalBodyType}. {Pronoun} is {DescriptionSuffixFromGemini}"`.
-    *   User inputs for Subject Name, Context ID, optional Body Type, and Pronoun.
-    *   Automated creation and upload of JSONL training data to GCS.
-*   **Vertex AI Integration:**
-    *   Submission of Imagen LoRA fine-tuning jobs using the `v1` API.
-    *   Monitoring of fine-tuning job status using the `v1` API.
-*   **Multi-Prompt Inference:**
-    *   Dedicated inference page for generating images with a fine-tuned model.
-    *   Support for multiple input prompts for batch generation.
-    *   Outputs (generated images and a JSON manifest) automatically saved to a timestamped folder in GCS.
-*   **Configuration:**
-    *   Centralized `config.py` for GCP project details, default GCS paths, model IDs.
-    *   `config.py.example` provided as a template.
-    *   `.gitignore` configured to exclude sensitive files and local data.
+## Key Features for Beginners
 
-## Prerequisites
+*   **Simple Web App:** Uses Streamlit for an easy-to-navigate interface. No complex commands needed for most tasks.
+*   **Train with Your Images:**
+    *   Easily upload images from your computer.
+    *   Images are automatically made smaller if they're too big for training.
+    *   You decide where your training files are stored in Google Cloud Storage.
+    *   AI helps you write good text prompts for your images.
+    *   You can customize how your prompts are structured (e.g., "A photo of {MyPet} [{ItemID}]. {MyPet} is {AI-generated description}").
+*   **Works with Google's Vertex AI:**
+    *   Sends your training jobs to Vertex AI.
+    *   Lets you see the status of your training jobs.
+*   **Generate Multiple Images:**
+    *   Create images using your trained model.
+    *   You can give it several text prompts at once to make many images.
+    *   Your new images are saved neatly in Google Cloud Storage.
+*   **Easy Configuration:**
+    *   A simple `config.py` file to tell the app about your Google Cloud project.
+    *   An example file (`config.py.example`) is provided to get you started.
 
-1.  **Google Cloud Platform (GCP) Account:** Billing enabled.
-2.  **GCP Project:**
-    *   Vertex AI API enabled.
-    *   Cloud Storage API enabled.
-3.  **`gcloud` CLI:** Google Cloud SDK installed and authenticated.
-4.  **Python:** Version 3.9 or higher.
-5.  **Virtual Environment:** Strongly recommended (e.g., `venv`, `conda`).
-6.  **Permissions:** The GCP user or service account used must have:
-    *   `Vertex AI User` role (or more specific roles for training jobs and endpoints).
-    *   `Storage Object Admin` (or `Storage Admin`) role for the GCS bucket used.
-    *   Permissions to enable necessary APIs if not already enabled.
+## Before You Start: Prerequisites
 
-## Setup Instructions
+You'll need a few things set up first:
 
-1.  **Clone the Repository:**
+1.  **Google Cloud Platform (GCP) Account:** If you don't have one, you'll need to sign up. Make sure billing is enabled (some services have costs).
+2.  **A GCP Project:**
+    *   Inside your GCP account, create a project.
+    *   Enable the "Vertex AI API" and "Cloud Storage API" for this project. (You can usually find these by searching in the GCP console.)
+3.  **`gcloud` Command-Line Tool:** This is Google Cloud's tool for your computer. Install it from the [Google Cloud SDK page](https://cloud.google.com/sdk/docs/install). After installing, log in with it.
+4.  **Python:** Make sure you have Python installed (version 3.9 or newer is best). You can get it from [python.org](https://www.python.org/downloads/).
+5.  **Virtual Environment (Recommended):** This keeps project dependencies tidy.
+    *   Python has `venv` built-in. Or you can use tools like `conda`.
+6.  **Permissions in GCP:** The Google account you use needs permission to:
+    *   Use Vertex AI (e.g., "Vertex AI User" role).
+    *   Read and write to Google Cloud Storage buckets (e.g., "Storage Object Admin" or "Storage Admin" role).
+
+## Step-by-Step Setup
+
+1.  **Get the Code (Clone the Repository):**
     ```bash
     git clone https://github.com/gauravz7/imagenlora.git
     cd imagenlora
     ```
 
-2.  **Create and Activate a Virtual Environment:**
+2.  **Create and Activate a Virtual Environment (Recommended):**
+    Open your terminal or command prompt in the `imagenlora` folder.
     ```bash
+    # For Mac/Linux
     python3 -m venv .venv
     source .venv/bin/activate
-    # On Windows: .venv\Scripts\activate
-    ```
 
-3.  **Install Dependencies:**
+    # For Windows
+    # python -m venv .venv  (if python3 doesn't work)
+    # .venv\Scripts\activate
+    ```
+    You should see `(.venv)` at the start of your command prompt line.
+
+3.  **Install Required Python Packages:**
+    While your virtual environment is active:
     ```bash
     pip install -r requirements.txt
     ```
-    *(Ensure `requirements.txt` includes `streamlit`, `google-cloud-aiplatform`, `google-generativeai`, `Pillow`, `google-cloud-storage`, `google-auth`, `requests`)*
+    This reads the `requirements.txt` file and installs all the necessary Python libraries.
 
-4.  **Configure `config.py`:**
-    *   Copy `config.py.example` to `config.py`:
+4.  **Set Up Your Configuration (`config.py`):**
+    *   Find the file `config.py.example`. Make a copy of it and name the copy `config.py`.
         ```bash
         cp config.py.example config.py
         ```
-    *   Edit `config.py` and replace placeholder values with your specific GCP `PROJECT_ID`, `LOCATION` (region), `GCS_BUCKET_NAME`, and update `LOCAL_IMAGE_DIR` to the path of your local image dataset. Other defaults can be reviewed and adjusted as needed.
+    *   Open `config.py` in a text editor.
+    *   You'll need to fill in:
+        *   `PROJECT_ID`: Your Google Cloud Project ID.
+        *   `LOCATION`: The GCP region you want to use (e.g., `us-central1`).
+        *   `GCS_BUCKET_NAME`: The name of a Google Cloud Storage bucket you want to use. If it doesn't exist, you might need to create it first in the GCP console.
+        *   `LOCAL_IMAGE_DIR`: The path on your computer where your training images are stored (e.g., `/Users/yourname/Pictures/MyTrainingSet` or `C:\Users\yourname\Pictures\MyTrainingSet`).
+    *   Review other settings and change them if needed.
 
-5.  **Authenticate with Google Cloud:**
-    *   If running the application locally, authenticate the `gcloud` CLI to provide Application Default Credentials (ADC):
-        ```bash
-        gcloud auth application-default login
-        ```
-    *   This allows the Python client libraries to authenticate to GCP services.
+5.  **Log In to Google Cloud (for the app to use):**
+    If you're running this on your own computer, make sure your `gcloud` tool is logged in so the Python code can access Google Cloud:
+    ```bash
+    gcloud auth application-default login
+    ```
+    Follow the instructions that appear in your browser.
 
-## Running the Application
+## How to Run the App
 
-Once setup is complete, run the Streamlit application from the project's root directory:
-```bash
-streamlit run app.py
-```
-The application will open in your default web browser. Use the sidebar to navigate between the "Fine-Tuning Pipeline" and "Imagen Inference" tools.
+Once everything is set up:
+1.  Make sure your virtual environment is active (you see `(.venv)` in your prompt).
+2.  In your terminal, from the `imagenlora` project folder, run:
+    ```bash
+    streamlit run app.py
+    ```
+3.  This should open the application in your web browser automatically.
+4.  Use the sidebar in the app to choose between "Fine-Tuning Pipeline" or "Imagen Inference."
 
-## File Structure
+## Understanding the Files
 
-*   `app.py`: Main Streamlit application. Contains UI logic for both fine-tuning and inference pages.
-*   `utils.py`: Utility functions for:
-    *   Google Cloud Storage operations (upload, list, download).
-    *   Image processing (compression, resizing for Gemini).
-    *   Gemini API calls for generating description suffixes.
-    *   Vertex AI fine-tuning job creation and monitoring.
-*   `config.py`: **User-configured** file for project-specific settings (PROJECT_ID, LOCATION, GCS_BUCKET_NAME, etc.). Ignored by Git.
-*   `config.py.example`: Template for `config.py`.
-*   `requirements.txt`: Python dependencies.
-*   `.gitignore`: Specifies intentionally untracked files (e.g., `config.py`, virtual environments, OS files).
-*   `README.md`: This file.
-*   `data_preparation.py`, `train_model.py`, `monitor_job.py`: Python scripts likely containing core logic or original script versions for the fine-tuning pipeline steps, now largely integrated into `app.py` and `utils.py`. (These might be refactored or removed if their functionality is fully covered by the Streamlit app).
+*   `app.py`: The main brain of the web application.
+*   `utils.py`: Contains helper functions for common tasks like talking to Google Cloud Storage, processing images, and interacting with Vertex AI.
+*   `config.py`: **Your personal configuration file.** This tells the app your specific Google Cloud details. (This file is ignored by Git, so your secrets stay safe).
+*   `config.py.example`: A template to help you create your `config.py`.
+*   `requirements.txt`: A list of all Python packages the project needs.
+*   `.gitignore`: Tells Git (version control) which files to ignore (like your `config.py`).
+*   `README.md`: This file!
+*   `data_preparation.py`, `train_model.py`, `monitor_job.py`: These might be older script versions or contain some core logic. The main functionality is now mostly in `app.py` and `utils.py`.
 
-## Usage Notes
+## Important Notes
 
-*   **GCS Bucket for Fine-Tuning:** The "Fine-Tuning Pipeline" page allows you to specify the GCS bucket to use in the sidebar. This overrides the default in `config.py` for that session.
-*   **GCS Bucket for Inference Outputs:** The "Imagen Inference" page saves generated images and a manifest to a subfolder within the GCS bucket defined by `st.session_state.get('user_gcs_bucket_name_ft', config.GCS_BUCKET_NAME)` (i.e., it uses the bucket configured for the fine-tuning pipeline, or the default from `config.py` if the fine-tuning page's sidebar input hasn't been used yet). The output path is `gs://<your-bucket>/imagen_inference_outputs/output-YYYYMMDD-HHMMSS/`.
-*   **Image Compression:** Local images selected for upload in the fine-tuning pipeline are automatically compressed if they exceed 5MB. The original local files are overwritten with compressed versions if successful.
-*   **API Quotas & Costs:** Be mindful of API usage quotas and associated costs on Google Cloud Platform for Vertex AI (training, endpoints, prediction) and Cloud Storage.
-*   **Error Handling:** The application includes basic error handling and logging to the Streamlit interface. Check the terminal console where Streamlit is running for more detailed logs from the Python scripts, especially for `gsutil` or `curl` command outputs during inference.
+*   **Google Cloud Storage Buckets:**
+    *   For Fine-Tuning: You can tell the app which GCS bucket to use in the sidebar.
+    *   For Inference: Images you create are saved to a subfolder (like `imagen_inference_outputs/output-YYYYMMDD-HHMMSS/`) in the GCS bucket you've set up.
+*   **Image Compression:** If your uploaded images are too big (over 5MB), the app tries to make them smaller. This will overwrite the original files on your computer if successful.
+*   **Costs:** Using Google Cloud services (Vertex AI, Storage) can cost money. Keep an eye on your usage and billing in the GCP console.
+*   **Errors:** The app tries to show errors in the interface. For more details, look at the console window where you started Streamlit.
+
+---
