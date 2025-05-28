@@ -18,6 +18,9 @@ from google.protobuf.json_format import ParseDict
 from google import genai
 from google.genai import types
 
+import streamlit as st # Added for st_log
+import subprocess # Ensure subprocess is imported for run_shell_command_inference
+
 try:
     from google.colab import auth as google_colab_auth
 except ImportError:
@@ -361,3 +364,21 @@ def monitor_tuning_job(job_name_path: str, location: str) -> Optional[Dict[str, 
 if __name__ == '__main__':
     print("Utils.py loaded.")
     pass
+
+# Helper functions moved from app.py
+def st_log(message, level="info"): 
+    if level == "info": st.info(message)
+    elif level == "success": st.success(message)
+    elif level == "warning": st.warning(message)
+    elif level == "error": st.error(message)
+    else: st.write(message)
+
+def run_shell_command_inference(command: str, capture_output=True) -> subprocess.CompletedProcess:
+    try:
+        result = subprocess.run(command, shell=True, capture_output=capture_output, text=True, check=False)
+        if result.stderr: print(f"Shell Command STDERR (Inference):\n{result.stderr}")
+        if result.returncode != 0: print(f"WARNING: Shell command (Inference) '{command.split()[0]}...' failed with return code {result.returncode}")
+    except Exception as e:
+        print(f"Exception during shell command execution for (Inference) '{command.split()[0]}...': {e}")
+        return subprocess.CompletedProcess(args=command, returncode=-1, stdout="", stderr=str(e))
+    return result
